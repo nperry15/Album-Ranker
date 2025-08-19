@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 interface User {
     id: string;
@@ -64,44 +65,47 @@ export default function Admin() {
     }
 
     return (
-        <Container>
-            <Typography variant="h4" gutterBottom>
-                Admin Dashboard
-            </Typography>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Username</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Role</TableCell>
-                        <TableCell>Edit</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {users.map((user) => (
-                        <TableRow key={user.id}>
-                            <TableCell>{user.username}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>
-                                <Select
-                                    value={user.role}
-                                    onChange={(e) =>
-                                        handleRoleChange(user.id, e.target.value as "user" | "admin")
-                                    }
-                                >
-                                    <MenuItem value="user">User</MenuItem>
-                                    <MenuItem value="admin">Admin</MenuItem>
-                                </Select>
-                            </TableCell>
-                            <TableCell>
-                                <IconButton>
-                                    <EditIcon />
-                                </IconButton>
-                            </TableCell>
+        <>
+            <Navbar></Navbar>
+            <Container>
+                <Typography variant="h4" gutterBottom>
+                    Admin Dashboard
+                </Typography>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Username</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Role</TableCell>
+                            <TableCell>Edit</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </Container>
+                    </TableHead>
+                    <TableBody>
+                        {users.map((user) => (
+                            <TableRow key={user.id}>
+                                <TableCell>{user.username}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>
+                                    <Select
+                                        value={user.role}
+                                        onChange={(e) =>
+                                            handleRoleChange(user.id, e.target.value as "user" | "admin")
+                                        }
+                                    >
+                                        <MenuItem value="user">User</MenuItem>
+                                        <MenuItem value="admin">Admin</MenuItem>
+                                    </Select>
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton>
+                                        <EditIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </Container>
+        </>
     );
 }
