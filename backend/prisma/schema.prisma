@@ -1,0 +1,95 @@
+// Prisma schema for AlbumRanker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(user)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  rankings     RankingSession[]
+  ratings      AlbumRating[]
+}
+
+model Album {
+  id         Int      @id @default(autoincrement())
+  title      String
+  artist     String?
+  spotifyId  String?  @unique
+  coverUrl   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  songs      Song[]
+  ratings    AlbumRating[]
+  rankings   RankingSession[]
+}
+
+model Song {
+  id            Int      @id @default(autoincrement())
+  title         String
+  trackNumber   Int?
+  spotifyId     String?  @unique
+  albumId       Int
+  album         Album    @relation(fields: [albumId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rankingItems  RankingItem[]
+}
+
+model AlbumRating {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  albumId   Int
+  stars     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id])
+  album Album @relation(fields: [albumId], references: [id])
+
+  @@unique([userId, albumId])
+}
+
+
+model RankingSession {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  albumId   Int
+  createdAt DateTime @default(now())
+
+  user   User  @relation(fields: [userId], references: [id])
+  album  Album @relation(fields: [albumId], references: [id])
+  items  RankingItem[]
+
+  @@unique([userId, albumId, createdAt]) // allows multiple sessions over time, unique per timestamp
+}
+
+model RankingItem {
+  id               Int      @id @default(autoincrement())
+  rankingSessionId Int
+  songId           Int
+  position         Int // 1 = top
+
+  session RankingSession @relation(fields: [rankingSessionId], references: [id])
+  song    Song           @relation(fields: [songId], references: [id])
+
+  @@unique([rankingSessionId, songId])
+  @@unique([rankingSessionId, position])
+}
